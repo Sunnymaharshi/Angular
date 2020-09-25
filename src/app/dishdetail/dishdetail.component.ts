@@ -6,11 +6,23 @@ import { FormBuilder, FormGroup, Validators } from '@angular/forms';
 import { Params, ActivatedRoute } from '@angular/router';
 import { Location } from '@angular/common';
 import { Comment } from '../shared/comment';
-
+import { trigger, state, style, animate, transition } from '@angular/animations';
+import { visibility, flyInOut, expand  } from '../animations/app.animation';
 @Component({
   selector: 'app-dishdetail',
   templateUrl: './dishdetail.component.html',
-  styleUrls: ['./dishdetail.component.scss']
+  styleUrls: ['./dishdetail.component.scss'],
+  // tslint:disable-next-line:use-host-property-decorator
+  host: {
+  '[@flyInOut]': 'true',
+  'style': 'display: block;'
+  },
+  animations: [
+    flyInOut(),
+    visibility(),
+    expand()
+  ]
+
 })
 export class DishdetailComponent implements OnInit {
   
@@ -25,6 +37,8 @@ export class DishdetailComponent implements OnInit {
 
   commentForm: FormGroup;
   comment: Comment;
+
+  visibility = 'shown';
 
   formErrors ={
     'author':'',
@@ -52,8 +66,9 @@ export class DishdetailComponent implements OnInit {
     this.createForm(); 
 
     this.dishservice.getDishIds().subscribe(dishIds => this.dishIds = dishIds);
-    this.route.params.pipe(switchMap((params: Params) => this.dishservice.getDish(params['id'])))
-    .subscribe(dish => { this.dish = dish; this.dishcopy=dish; this.setPrevNext(dish.id); },errmess => this.errMess = <any>errmess);
+    this.route.params
+    .pipe(switchMap((params: Params) => { this.visibility ='hidden';return this.dishservice.getDish(params['id']);}))
+    .subscribe(dish => { this.dish = dish; this.dishcopy=dish; this.setPrevNext(dish.id); this.visibility= 'shown'; }, errmess => this.errMess = <any>errmess);
   }
   setPrevNext(dishId: string) {
     const index = this.dishIds.indexOf(dishId);
