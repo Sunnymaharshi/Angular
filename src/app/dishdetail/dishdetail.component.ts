@@ -21,21 +21,20 @@ export class DishdetailComponent implements OnInit {
   prev: string;
   next: string;
   errMess: string;
+  dishcopy: Dish;
 
   commentForm: FormGroup;
   comment: Comment;
 
   formErrors ={
     'author':'',
-    'rating': 5,
     'comment': ''
   };
 
   validationMessages = {
     'author':{
       'required': 'Author name is required.',
-      'minlenth': 'Author name must be at least  2 characters long.',
-      'maxlength': 'Author name cannot be more than 25 characters.'
+      'minlenth': 'Author name must be at least  2 characters long.'
     },
     'comment':{
       'required': 'Comment is required',
@@ -51,9 +50,10 @@ export class DishdetailComponent implements OnInit {
 
   ngOnInit() {
     this.createForm(); 
+
     this.dishservice.getDishIds().subscribe(dishIds => this.dishIds = dishIds);
     this.route.params.pipe(switchMap((params: Params) => this.dishservice.getDish(params['id'])))
-    .subscribe(dish => { this.dish = dish; this.setPrevNext(dish.id); },errmess => this.errMess = <any>errmess);
+    .subscribe(dish => { this.dish = dish; this.dishcopy=dish; this.setPrevNext(dish.id); },errmess => this.errMess = <any>errmess);
   }
   setPrevNext(dishId: string) {
     const index = this.dishIds.indexOf(dishId);
@@ -104,18 +104,20 @@ export class DishdetailComponent implements OnInit {
   onSubmit() {
     this.comment = this.commentForm.value;
     this.comment.date = new Date().toISOString();
-    this.dish.comments.push(this.comment);
     console.log(this.comment);
+    this.dishcopy.comments.push(this.comment);
+    this.dishservice.putDish(this.dishcopy)
+      .subscribe(dish => {
+        this.dish = dish; this.dishcopy = dish;
+      },
+      errmess => { this.dish = null; this.dishcopy = null; this.errMess = <any>errmess; });    
+    this.commentFormDirective.resetForm();
     this.commentForm.reset({
       author: '',
       comment: '',
       rating: 5
     });
-    this.commentFormDirective.resetForm({
-      author:'',
-      comment: "",
-      rating: 5
-    });
+    
   }
 
 
