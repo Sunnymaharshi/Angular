@@ -35,11 +35,12 @@
       </div>
     </div>
   </div>
-  <div fxFlex fxFlexOffset="20px" class="form-size">
-    <h3>Send us your Feedback</h3>
-    <p>{{ feedbackForm.value | json }} {{ feedbackForm.status | json }}</p>
+  <div fxFlex fxFlexOffset="20px" class="form-size" [@expand]="" >
+    <h3>Send us your Feedback</h3>    
+   
+    <!--<p>{{ feedbackForm.value | json }} {{ feedbackForm.status | json }}</p>-->
 
-    <form novalidate [formGroup]="feedbackForm" #fform="ngForm" (ngSubmit)="onSubmit()">
+    <form novalidate [formGroup]="feedbackForm" #fform="ngForm" (ngSubmit)="onSubmit()" *ngIf="!isLoading" @expand="">
       <p>
         <mat-form-field class="half-width">
           <input matInput formControlName="firstname" placeholder="First Name" type="text" required>
@@ -79,5 +80,36 @@
       </p>
       <button type="submit" mat-button class="background-primary text-floral-white" [disabled]="feedbackForm.invalid">Submit</button>
     </form>
+    <div *ngIf="isLoading &amp;&amp; !isShowingResponse" @expand="">
+      <h3>Submiting Form</h3>
+      <br>
+	    <mat-spinner></mat-spinner>
+    </div>
+    <div *ngIf="isShowingResponse" style="display: flex;" @expand="">      
+      <mat-list>
+      <h3 matLine>Your Submission</h3> 
+      <mat-list-item>
+        <p matLine="">First Name: {{feedback.firstname}}</p>
+      </mat-list-item>
+      <mat-list-item>
+        <p matLine="">Last Name: {{feedback.lastname}}</p>
+      </mat-list-item>
+      <mat-list-item>
+        <p matLine="">Tel. number: {{feedback.telnum}}</p>
+      </mat-list-item>
+      <mat-list-item>
+        <p matLine="">Email: {{feedback.email}}</p>
+      </mat-list-item>
+      <mat-list-item>
+        <p matLine="">Contact you?: {{feedback.agree}}</p>
+      </mat-list-item>
+      <mat-list-item>
+        <p matLine="">How?: {{feedback.contacttype}}</p>
+      </mat-list-item>
+      <mat-list-item>
+        <p matLine="">Feedback: {{feedback.message}}</p>
+      </mat-list-item>
+    </mat-list>
+    </div>
   </div>
 </div>
